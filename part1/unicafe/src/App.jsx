@@ -18,11 +18,7 @@ const Button = ({ text, handleClick }) => {
   return <button onClick={handleClick}>{text}</button>;
 };
 
-const RenderStatistics = ({
-  goodStatistics,
-  neutralStatistics,
-  badStatistics,
-}) => {
+const Statistics = ({ goodStatistics, neutralStatistics, badStatistics }) => {
   const total = goodStatistics + neutralStatistics + badStatistics;
   return (
     <div>
@@ -51,11 +47,11 @@ const App = () => {
         onBadClick={() => setBad(bad + 1)}
       ></RenderButtons>
       <Header text="statistics"></Header>
-      <RenderStatistics
+      <Statistics
         goodStatistics={good}
         neutralStatistics={neutral}
         badStatistics={bad}
-      ></RenderStatistics>
+      ></Statistics>
     </div>
   );
 };
