@@ -23,11 +23,15 @@ const RenderStatistics = ({
   neutralStatistics,
   badStatistics,
 }) => {
+  const total = goodStatistics + neutralStatistics + badStatistics;
   return (
     <div>
       <p>good {goodStatistics}</p>
       <p>neutral {neutralStatistics}</p>
       <p>bad {badStatistics}</p>
+      <p>all {total}</p>
+      <p>average {(goodStatistics - badStatistics) / total}</p>
+      <p>positive {(goodStatistics / total) * 100}</p>
     </div>
   );
 };
