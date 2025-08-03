@@ -1,13 +1,13 @@
 const Header = ({ props }) => <h1>{props.name}</h1>;
 
 const Content = ({ props }) => {
-  console.log("This is the Content log", props.parts[0]);
+  console.log("This is the Content log", props);
 
   return (
     <div>
-      <Part props={props.parts[0]} />
-      <Part props={props.parts[1]} />
-      <Part props={props.parts[2]} />
+      {props.map((part) => (
+        <Part key={part.id} props={part}></Part>
+      ))}
     </div>
   );
 };
@@ -27,7 +27,7 @@ const Course = ({ course }) => {
   return (
     <>
       <Header props={course}></Header>
-      <Content props={course}></Content>
+      <Content props={course.parts}></Content>
     </>
   );
 };
