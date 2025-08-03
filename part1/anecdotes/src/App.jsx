@@ -1,13 +1,19 @@
 import { useState } from "react";
 
-const generateRandomNumber = (arrayLength) => {
-  const randomIndex = Math.floor(Math.random() * arrayLength);
-  return randomIndex;
+const Header = ({ text }) => {
+  return <h1>{text}</h1>;
 };
 
-const Button = ({ generateRandomNumber, arrayLength, setSelected }) => {
+const generateRandomNumber = (arrayLength) =>
+  Math.floor(Math.random() * arrayLength);
+
+const Button = ({ arrayLength, setSelected, current }) => {
   const handleClick = () => {
     let randomIndex = generateRandomNumber(arrayLength);
+    while (randomIndex === current) {
+      randomIndex = generateRandomNumber(arrayLength);
+    }
+    console.log(randomIndex);
     setSelected(randomIndex);
   };
 
@@ -24,6 +30,24 @@ const VoteButton = ({ selected, votes, setVotes }) => {
   };
 
   return <button onClick={handleClick}>vote</button>;
+};
+
+const findMaxNumber = (array) => {
+  let max = array[0];
+  let maxIndex = 0;
+  for (let i = 1; i < array.length; i++) {
+    if (array[i] > max) {
+      max = array[i];
+      maxIndex = i;
+    }
+  }
+
+  return maxIndex;
+};
+
+const MostVotedAnecdote = ({ array, anecdotes }) => {
+  let maxIndex = findMaxNumber(array);
+  return <p>{anecdotes[maxIndex]}</p>;
 };
 
 const App = () => {
@@ -43,6 +67,7 @@ const App = () => {
 
   return (
     <div>
+      <Header text="Anecdote of the day"></Header>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <VoteButton
@@ -51,10 +76,15 @@ const App = () => {
         setVotes={setVotes}
       ></VoteButton>
       <Button
-        generateRandomNumber={generateRandomNumber}
         arrayLength={anecdotes.length}
         setSelected={setSelected}
-      />{" "}
+        current={selected}
+      />
+      <Header text="Anecdote with most votes"></Header>
+      <MostVotedAnecdote
+        array={votes}
+        anecdotes={anecdotes}
+      ></MostVotedAnecdote>
     </div>
   );
 };
