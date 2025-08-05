@@ -4,6 +4,10 @@ const RenderNames = ({ names }) => {
   return names.map((name) => <p key={name.id}>{name.name}</p>);
 };
 
+const isDuplicateName = (array, name) => {
+  return array.find((element) => element.name === name);
+};
+
 const App = () => {
   const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
   const [newName, setNewName] = useState("");
@@ -12,6 +16,11 @@ const App = () => {
     event.preventDefault();
     console.log(persons);
     const nameObject = { name: newName, id: newName };
+
+    if (isDuplicateName(persons, newName)) {
+      alert(`${newName} is already in the phonebook`);
+      return;
+    }
 
     setPersons(persons.concat(nameObject));
     setNewName("");
