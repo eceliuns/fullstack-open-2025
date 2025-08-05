@@ -1,20 +1,7 @@
 import { useState } from "react";
-
-const Filter = ({ persons, newSearch }) => {
-  let filteredPeople = persons.filter((person) =>
-    person.name.toLowerCase().includes(newSearch.toLowerCase())
-  );
-
-  return filteredPeople.map((person) => (
-    <p key={person.id}>
-      {person.name} {person.number}
-    </p>
-  ));
-};
-
-const isDuplicateName = (array, name) => {
-  return array.find((element) => element.name === name);
-};
+import Filter from "./components/Filter";
+import PersonList from "./components/PersonList";
+import PersonForm from "./components/PersonForm";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -25,7 +12,11 @@ const App = () => {
   ]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-  const [newSearch, setNewSearch] = useState("");
+  const [newFilter, setNewFilter] = useState("");
+
+  const isDuplicateName = (array, name) => {
+    return array.find((element) => element.name === name);
+  };
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -49,31 +40,24 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
-  const handleSearchChange = (event) => {
-    setNewSearch(event.target.value);
+  const handleFilterChange = (event) => {
+    setNewFilter(event.target.value);
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with{" "}
-        <input value={newSearch} onChange={handleSearchChange}></input>
-      </div>
-      <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      <Filter persons={persons} newSearch={newSearch}></Filter>
+      <Filter value={newFilter} onChange={handleFilterChange}></Filter>
+      <h3>add a new</h3>
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      ></PersonForm>
+      <h3>Numbers</h3>
+      <PersonList persons={persons} newFilter={newFilter}></PersonList>
     </div>
   );
 };
