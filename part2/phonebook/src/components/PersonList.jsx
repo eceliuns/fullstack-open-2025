@@ -5,7 +5,9 @@ const PersonList = ({ persons, newFilter }) => {
     person.name.toLowerCase().includes(newFilter.toLowerCase())
   );
 
-  return filteredPeople.map((person) => <Person person={person}></Person>);
+  return filteredPeople.map((person) => (
+    <Person key={person.id} person={person}></Person>
+  ));
 };
 
 export default PersonList;
