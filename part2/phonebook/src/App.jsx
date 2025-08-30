@@ -21,13 +21,53 @@ const App = () => {
     return array.find((element) => element.name === name);
   };
 
+  const isDuplicateNumber = (array, number) => {
+    return array.find((element) => element.number === number);
+  };
+
   const addPerson = (event) => {
     event.preventDefault();
     const personObject = { id: newName, name: newName, number: newNumber };
 
-    if (isDuplicateName(persons, newName)) {
+    if (
+      isDuplicateName(persons, newName) &&
+      isDuplicateNumber(persons, newNumber)
+    ) {
       alert(`${newName} is already in the phonebook`);
       return;
+    }
+
+    if (
+      isDuplicateName(persons, newName) &&
+      !isDuplicateNumber(persons, newNumber)
+    ) {
+      if (
+        window.confirm(
+          `${newName} is already added to the phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const existingPerson = persons.find((p) => p.name === newName);
+        const updatedPerson = { ...existingPerson, number: newNumber };
+
+        personService
+          .update(existingPerson.id, updatedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((p) =>
+                p.id !== existingPerson.id ? p : returnedPerson
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            alert(
+              `Information of ${existingPerson.name} has already been update from the server.`
+            );
+            setPersons(persons.filter((p) => p.id !== existingPerson.id));
+          });
+        return;
+      }
     }
 
     personService.create(personObject).then((returnedPerson) => {
@@ -49,12 +89,18 @@ const App = () => {
     setNewFilter(event.target.value);
   };
 
-  const deletePerson = (id) => {
-    if (window.confirm(`Delete ${id}?`)) {
+  const deletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
       const url = `http://localhost:3001/persons/${id}`;
-      axios.delete(url).then(() => {
-        setPersons(persons.filter((p) => p.id !== id));
-      });
+      axios
+        .delete(url)
+        .then(() => {
+          setPersons(persons.filter((p) => p.id !== id));
+        })
+        .catch((error) => {
+          alert(`${name} was already deleted from server`);
+          setPersons(persons.filter((p) => p.id !== id));
+        });
     }
   };
 
