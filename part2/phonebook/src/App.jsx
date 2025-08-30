@@ -92,9 +92,15 @@ const App = () => {
   const deletePerson = (id, name) => {
     if (window.confirm(`Delete ${name}?`)) {
       const url = `http://localhost:3001/persons/${id}`;
-      axios.delete(url).then(() => {
-        setPersons(persons.filter((p) => p.id !== id));
-      });
+      axios
+        .delete(url)
+        .then(() => {
+          setPersons(persons.filter((p) => p.id !== id));
+        })
+        .catch((error) => {
+          alert(`${name} was already deleted from server`);
+          setPersons(persons.filter((p) => p.id !== id));
+        });
     }
   };
 
