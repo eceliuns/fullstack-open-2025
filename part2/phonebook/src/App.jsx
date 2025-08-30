@@ -68,7 +68,7 @@ const App = () => {
           })
           .catch((error) => {
             alert(
-              `Information of ${existingPerson.name} has already been update from the server.`
+              `Information of ${existingPerson.name} has already been updated from the server.`
             );
             setPersons(persons.filter((p) => p.id !== existingPerson.id));
           });
