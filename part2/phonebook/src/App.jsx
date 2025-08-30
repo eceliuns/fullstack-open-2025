@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import personService from "./services/persons";
 import Filter from "./components/Filter";
 import PersonList from "./components/PersonList";
@@ -48,6 +49,15 @@ const App = () => {
     setNewFilter(event.target.value);
   };
 
+  const deletePerson = (id) => {
+    if (window.confirm(`Delete ${id}?`)) {
+      const url = `http://localhost:3001/persons/${id}`;
+      axios.delete(url).then(() => {
+        setPersons(persons.filter((p) => p.id !== id));
+      });
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -61,7 +71,11 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       ></PersonForm>
       <h3>Numbers</h3>
-      <PersonList persons={persons} newFilter={newFilter}></PersonList>
+      <PersonList
+        persons={persons}
+        newFilter={newFilter}
+        deletePerson={deletePerson}
+      ></PersonList>
     </div>
   );
 };
