@@ -9,7 +9,7 @@ const PersonList = ({ persons, newFilter, deletePerson }) => {
     <Person
       key={person.id}
       person={person}
-      deletePerson={() => deletePerson(person.id)}
+      deletePerson={() => deletePerson(person.id, person.name)}
     ></Person>
   ));
 };
