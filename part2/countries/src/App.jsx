@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Filter from "./components/Filter";
+import CountryList from "./components/CountryList";
 
 function App() {
   const [countries, setCountries] = useState([]);
+  const [newFilter, setNewFilter] = useState("");
 
   useEffect(() => {
     axios
@@ -16,7 +19,16 @@ function App() {
       });
   }, []);
 
-  return <></>;
+  const handleFilterChange = (event) => {
+    setNewFilter(event.target.value);
+  };
+
+  return (
+    <>
+      <Filter value={newFilter} onChange={handleFilterChange}></Filter>
+      <CountryList countries={countries} newFilter={newFilter}></CountryList>
+    </>
+  );
 }
 
 export default App;
