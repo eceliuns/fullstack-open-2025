@@ -128,8 +128,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} className={'success'}></Notification>
-      <Notification message ={message} className={'error'}></Notification>
+      <Notification message={message} className={messageClass}></Notification>
       <Filter value={newFilter} onChange={handleFilterChange}></Filter>
       <h3>add a new</h3>
       <PersonForm
