@@ -11,7 +11,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [successMessage, setSuccessMessage] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [messageClass, setMessageClass] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -61,15 +62,20 @@ const App = () => {
             );
             setNewName("");
             setNewNumber("");
-            setSuccessMessage(`Updated ${updatedPerson.name}'s number`);
+            setMessageClass("success")
+            setMessage(`Updated ${updatedPerson.name}'s number`);
             setTimeout(() => {
-              setSuccessMessage(null);
+              setMessage(null);
             }, 5000);
           })
           .catch((error) => {
-            alert(
+            setMessageClass("error");
+            setMessage(
               `Information of ${existingPerson.name} has already been updated from the server.`
             );
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
             setPersons(persons.filter((p) => p.id !== existingPerson.id));
           });
         return;
@@ -80,9 +86,10 @@ const App = () => {
       setPersons(persons.concat(returnedPerson));
       setNewName("");
       setNewNumber("");
-      setSuccessMessage(`Added ${personObject.name}`);
+      setMessageClass("success");
+      setMessage(`Added ${personObject.name}`);
       setTimeout(() => {
-        setSuccessMessage(null);
+        setMessage(null);
       }, 5000);
     });
   };
@@ -108,7 +115,11 @@ const App = () => {
           setPersons(persons.filter((p) => p.id !== id));
         })
         .catch((error) => {
-          alert(`${name} was already deleted from server`);
+          setMessageClass("error");
+          setMessage(`${name} was already deleted from server`);
+          setTimeout(()=> {
+            setMessage(null)
+          }, 5000)
           setPersons(persons.filter((p) => p.id !== id));
         });
     }
@@ -117,7 +128,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage}></Notification>
+      <Notification message={message} className={'success'}></Notification>
+      <Notification message ={message} className={'error'}></Notification>
       <Filter value={newFilter} onChange={handleFilterChange}></Filter>
       <h3>add a new</h3>
       <PersonForm
