@@ -11,11 +11,15 @@ function App() {
     axios
       .get("https://studies.cs.helsinki.fi/restcountries/api/all")
       .then((response) => {
-        const names = response.data.map((country) => ({
+        const countriesData = response.data.map((country) => ({
           name: country.name.common,
+          capital: country.capital,
+          area: country.area,
+          languages: Object.values(country.languages || {}),
+          flag: country.flags.png,
         }));
-        setCountries(names);
-        console.log(names);
+        setCountries(countriesData);
+        console.log(countriesData);
       });
   }, []);
 

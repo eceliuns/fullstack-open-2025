@@ -1,4 +1,5 @@
 import Country from "./Country";
+import CompleteCountry from "./CompleteCountry";
 
 const CountryList = ({ countries, newFilter }) => {
   let filteredCountries = countries.filter((country) => {
@@ -17,11 +18,15 @@ const CountryList = ({ countries, newFilter }) => {
     return <p>No matches found</p>;
   }
 
-  if (filteredCountries.length < 10 && filteredCountries.length != 0) {
+  if (filteredCountries.length === 1) {
     return filteredCountries.map((country) => (
-      <Country key={country.name} country={country}></Country>
+      <CompleteCountry key={country.name} country={country}></CompleteCountry>
     ));
   }
+
+  return filteredCountries.map((country) => (
+    <Country key={country.name} country={country}></Country>
+  ));
 };
 
 export default CountryList;
