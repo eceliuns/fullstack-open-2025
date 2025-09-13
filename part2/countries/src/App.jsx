@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Filter from "./components/Filter";
 import CountryList from "./components/CountryList";
+import CompleteCountry from "./components/CompleteCountry";
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [newFilter, setNewFilter] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
     axios
@@ -25,12 +27,22 @@ function App() {
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value);
+    setSelectedCountry(null);
+  };
+
+  const handleShow = (country) => {
+    setSelectedCountry(country);
   };
 
   return (
     <>
       <Filter value={newFilter} onChange={handleFilterChange}></Filter>
-      <CountryList countries={countries} newFilter={newFilter}></CountryList>
+      <CountryList
+        countries={countries}
+        newFilter={newFilter}
+        onClick={handleShow}
+      ></CountryList>
+      {selectedCountry && <CompleteCountry country={selectedCountry} />}
     </>
   );
 }

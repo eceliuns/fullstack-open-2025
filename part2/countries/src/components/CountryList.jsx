@@ -1,7 +1,7 @@
 import Country from "./Country";
 import CompleteCountry from "./CompleteCountry";
 
-const CountryList = ({ countries, newFilter }) => {
+const CountryList = ({ countries, newFilter, onClick }) => {
   let filteredCountries = countries.filter((country) => {
     return country.name.toLowerCase().includes(newFilter.toLowerCase());
   });
@@ -25,7 +25,10 @@ const CountryList = ({ countries, newFilter }) => {
   }
 
   return filteredCountries.map((country) => (
-    <Country key={country.name} country={country}></Country>
+    <div key={country.name}>
+      <Country country={country}></Country>
+      <button onClick={() => onClick(country)}>Show</button>
+    </div>
   ));
 };
 
