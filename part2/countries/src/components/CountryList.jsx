@@ -1,10 +1,16 @@
 import Country from "./Country";
-import CompleteCountry from "./CompleteCountry";
+import { useEffect } from "react";
 
 const CountryList = ({ countries, newFilter, onClick }) => {
   let filteredCountries = countries.filter((country) => {
     return country.name.toLowerCase().includes(newFilter.toLowerCase());
   });
+
+  useEffect(() => {
+    if (filteredCountries.length === 1) {
+      onClick(filteredCountries[0]);
+    }
+  }, [filteredCountries, onClick]);
 
   if (!newFilter.trim()) {
     return null;
@@ -16,12 +22,6 @@ const CountryList = ({ countries, newFilter, onClick }) => {
 
   if (filteredCountries.length === 0) {
     return <p>No matches found</p>;
-  }
-
-  if (filteredCountries.length === 1) {
-    return filteredCountries.map((country) => (
-      <CompleteCountry key={country.name} country={country}></CompleteCountry>
-    ));
   }
 
   return filteredCountries.map((country) => (

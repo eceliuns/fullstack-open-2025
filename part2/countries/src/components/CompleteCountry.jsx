@@ -1,7 +1,6 @@
-const CompleteCountry = ({ country }) => {
-  //   const capitals = country.capital.map((capital, index) => {
-  //     return <p key={index}>{capital}</p>;
-  //   });
+import Weather from "./Weather";
+
+const CompleteCountry = ({ country, weather }) => {
   const languages = country.languages.map((language, index) => (
     <li key={index}>{language}</li>
   ));
@@ -14,6 +13,7 @@ const CompleteCountry = ({ country }) => {
       <h2>Languages</h2>
       <ul>{languages}</ul>
       <img src={country.flag}></img>
+      <Weather country={country} weather={weather}></Weather>
     </div>
   );
 };
