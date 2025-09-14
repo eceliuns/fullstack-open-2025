@@ -1,29 +1,34 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Filter from "./components/Filter";
 import CountryList from "./components/CountryList";
 import CompleteCountry from "./components/CompleteCountry";
+import countryService from "./services/countries";
+import weatherService from "./services/weather";
 
 function App() {
   const [countries, setCountries] = useState([]);
+  const [weather, setWeather] = useState(null);
   const [newFilter, setNewFilter] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const apiKey = import.meta.env.VITE_OPENWEATHER_KEY;
 
   useEffect(() => {
-    axios
-      .get("https://studies.cs.helsinki.fi/restcountries/api/all")
-      .then((response) => {
-        const countriesData = response.data.map((country) => ({
-          name: country.name.common,
-          capital: country.capital,
-          area: country.area,
-          languages: Object.values(country.languages || {}),
-          flag: country.flags.png,
-        }));
-        setCountries(countriesData);
-        console.log(countriesData);
+    countryService
+      .getAll()
+      .then(setCountries)
+      .catch((error) => {
+        console.error("Failed to fetch countries:", error.message);
       });
   }, []);
+
+  useEffect(() => {
+    if (!selectedCountry?.capital) return;
+
+    weatherService
+      .getWeather(selectedCountry.capital, apiKey)
+      .then(setWeather)
+      .catch((err) => console.error("Weather fetch error:", err.message));
+  }, [selectedCountry, apiKey]);
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value);
@@ -41,8 +46,11 @@ function App() {
         countries={countries}
         newFilter={newFilter}
         onClick={handleShow}
+        weather={weather}
       ></CountryList>
-      {selectedCountry && <CompleteCountry country={selectedCountry} />}
+      {selectedCountry && (
+        <CompleteCountry country={selectedCountry} weather={weather} />
+      )}
     </>
   );
 }
