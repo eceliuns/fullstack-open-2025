@@ -1,7 +1,5 @@
 ### Get all persons
 GET http://localhost:3001/api/persons
 
-### Delete person with ID 2
-DELETE http://localhost:3001/api/persons/2
 
 
