@@ -61,6 +61,31 @@ test.only("blogs have id property and it is unique", async () => {
   }
 });
 
+test.only("HTTP request to api/blogs successfully creates a new post"),
+  async () => {
+    const newBlog = {
+      title: "New Blog",
+      author: "Test Author",
+      url: "http://example.com",
+      likes: 5,
+    };
+
+    const response = await api.post("/api/blogs").send(newBlog);
+
+    assert.strictEqual(response.status, 201, "Response status should be 201");
+    assert.ok(
+      response.headers["content-type"].includes("application/json"),
+      "Response should be JSON"
+    );
+
+    const blogsAfter = await Blog.find({});
+    assert.strictEqual(blogsAfter.length, 3);
+
+    //Verify the new blog is saved correctly
+    const titles = blogsAfter.map((b) => b.title);
+    assert.ok(titles.includes("New Blog"), "New blog title should be in DB");
+  };
+
 after(async () => {
   await mongoose.connection.close();
 });
