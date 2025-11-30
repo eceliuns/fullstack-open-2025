@@ -107,7 +107,7 @@ test("if likes property is missing, it defaults to 0", async () => {
   );
 });
 
-test.only("DELETE /api/blogs/:id deletes a blog", async () => {
+test("DELETE /api/blogs/:id deletes a blog", async () => {
   const newBlog = {
     title: "Blog to delete",
     author: "Test Author",
@@ -122,11 +122,36 @@ test.only("DELETE /api/blogs/:id deletes a blog", async () => {
     .expect("Content-Type", /application\/json/);
 
   await api.delete(`/api/blogs/${postedBlog.body.id}`).expect(204);
+});
 
-  // const blogsAtEnd = await Blog.find({});
-  // const ids = blogsAtEnd.map((blog) => blog.id);
+test.only("PUT /api/blogs/:id updates a blog", async () => {
+  const blogsAtStart = await Blog.find({});
+  const blogToUpdate = blogsAtStart[0];
 
-  // assert.ok(!ids.includes(postedBlog.body.id));
+  const updatedData = {
+    title: "Updated Title",
+    author: "Updated Author",
+    url: "http://updated.com",
+    likes: 103,
+  };
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedData)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  // Check that the response matches updated data
+  assert.strictEqual(response.body.title, updatedData.title);
+  assert.strictEqual(response.body.author, updatedData.author);
+  assert.strictEqual(response.body.url, updatedData.url);
+  assert.strictEqual(response.body.likes, updatedData.likes);
+
+  // Check that DB has been updated
+  const blogsAtEnd = await Blog.find({});
+  const updatedBlog = blogsAtEnd.find((b) => b.id === blogToUpdate.id);
+  assert.strictEqual(updatedBlog.title, updatedData.title);
+  assert.strictEqual(updatedBlog.likes, updatedData.likes);
 });
 
 after(async () => {
