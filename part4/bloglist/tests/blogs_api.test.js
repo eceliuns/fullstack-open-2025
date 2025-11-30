@@ -40,7 +40,7 @@ test("all blogs are returned", async () => {
   assert.strictEqual(response.body.length, initialBlogs.length);
 });
 
-test.only("blogs have id property and it is unique", async () => {
+test("blogs have id property and it is unique", async () => {
   const response = await api.get("/api/blogs");
   const blogs = response.body;
 
@@ -61,7 +61,7 @@ test.only("blogs have id property and it is unique", async () => {
   }
 });
 
-test.only("HTTP request to api/blogs successfully creates a new post"),
+test("HTTP request to api/blogs successfully creates a new post"),
   async () => {
     const newBlog = {
       title: "New Blog",
@@ -85,6 +85,27 @@ test.only("HTTP request to api/blogs successfully creates a new post"),
     const titles = blogsAfter.map((b) => b.title);
     assert.ok(titles.includes("New Blog"), "New blog title should be in DB");
   };
+
+test.only("if likes property is missing, it defaults to 0", async () => {
+  const newBlog = {
+    title: "Blog missing likes",
+    author: "Test Author",
+    url: "http://example.com",
+  };
+
+  const response = await api.post("/api/blogs").send(newBlog);
+  assert.strictEqual(response.status, 201, "Status should be 201");
+  assert.ok(
+    response.headers["content-type"].includes("application/json"),
+    "Response should be JSON"
+  );
+
+  assert.strictEqual(
+    response.body.likes,
+    0,
+    "Likes should default to 0 when missing"
+  );
+});
 
 after(async () => {
   await mongoose.connection.close();
