@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require("node:test");
+const { test, after, before, beforeEach } = require("node:test");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const assert = require("node:assert");
@@ -86,7 +86,7 @@ test("HTTP request to api/blogs successfully creates a new post"),
     assert.ok(titles.includes("New Blog"), "New blog title should be in DB");
   };
 
-test.only("if likes property is missing, it defaults to 0", async () => {
+test("if likes property is missing, it defaults to 0", async () => {
   const newBlog = {
     title: "Blog missing likes",
     author: "Test Author",
@@ -105,6 +105,28 @@ test.only("if likes property is missing, it defaults to 0", async () => {
     0,
     "Likes should default to 0 when missing"
   );
+});
+
+test.only("DELETE /api/blogs/:id deletes a blog", async () => {
+  const newBlog = {
+    title: "Blog to delete",
+    author: "Test Author",
+    url: "http://testurl.com",
+    likes: 10,
+  };
+
+  const postedBlog = await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  await api.delete(`/api/blogs/${postedBlog.body.id}`).expect(204);
+
+  // const blogsAtEnd = await Blog.find({});
+  // const ids = blogsAtEnd.map((blog) => blog.id);
+
+  // assert.ok(!ids.includes(postedBlog.body.id));
 });
 
 after(async () => {

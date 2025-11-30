@@ -1,6 +1,6 @@
 const blogsRouter = require("express").Router();
-const blog = require("../models/blog");
 const Blog = require("../models/blog");
+const mongoose = require("mongoose");
 
 blogsRouter.get("/", async (request, response, next) => {
   try {
@@ -19,14 +19,32 @@ blogsRouter.post("/", async (request, response, next) => {
       title: body.title,
       author: body.author,
       url: body.url,
+      likes: body.likes,
     });
 
     const savedBlog = await blog.save();
 
-    console.log("request.body:", request.body);
-    console.log("savedBlog:", savedBlog);
-
     response.status(201).json(savedBlog);
+  } catch (error) {
+    next(error);
+  }
+});
+
+blogsRouter.delete("/:id", async (request, response, next) => {
+  try {
+    const { id } = request.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return response.status(400).json({ error: "malformatted id" });
+    }
+
+    const deletedBlog = await Blog.findByIdAndDelete(id);
+
+    if (!deletedBlog) {
+      return response.status(404).json({ error: "blog not found" });
+    }
+
+    return response.status(204).end();
   } catch (error) {
     next(error);
   }
