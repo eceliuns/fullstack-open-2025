@@ -16,9 +16,9 @@ mongoose
   });
 
 const blogSchema = new mongoose.Schema({
-  title: String,
+  title: { type: String, required: true },
   author: String,
-  url: String,
+  url: { type: String, required: true },
   likes: { type: Number, default: 0 },
 });
 
@@ -35,11 +35,13 @@ const Blog = mongoose.model("Blog", blogSchema);
 const blog1 = new Blog({
   title: "Test1",
   author: "Author1",
+  url: "Test url",
 });
 
 const blog2 = new Blog({
   title: "Test2",
   author: "Author2",
+  url: "Test url",
 });
 
 Promise.all([blog1.save(), blog2.save()])
