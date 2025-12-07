@@ -158,7 +158,7 @@ test("PUT /api/blogs/:id updates a blog", async () => {
   assert.strictEqual(updatedBlog.likes, updatedData.likes);
 });
 
-describe.only("when there is initially one user in db", () => {
+describe("when there is initially one user in db", () => {
   beforeEach(async () => {
     await User.deleteMany({});
 
@@ -189,27 +189,108 @@ describe.only("when there is initially one user in db", () => {
     const usernames = usersAtEnd.map((u) => u.username);
     assert(usernames.includes(newUser.username));
   });
-});
 
-test.only("creation fails with proper statuscode and message if username already taken", async () => {
-  const usersAtStart = await helper.usersInDb();
+  test("creation fails with proper statuscode and message if username already taken", async () => {
+    const usersAtStart = await helper.usersInDb();
 
-  const newUser = {
-    username: "root",
-    name: "Superuser",
-    password: "salainen",
-  };
+    const newUser = {
+      username: "root",
+      name: "Superuser",
+      password: "salainen",
+    };
 
-  const result = await api
-    .post("/api/users")
-    .send(newUser)
-    .expect(400)
-    .expect("Content-Type", /application\/json/);
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
 
-  const usersAtEnd = await helper.usersInDb();
-  assert(result.body.error.includes("expected `username` to be unique"));
+    const usersAtEnd = await helper.usersInDb();
+    assert(result.body.error.includes("expected `username` to be unique"));
 
-  assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+  });
+
+  test("creation fails if username is shorter than 3 characters", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "12",
+      name: "testName",
+      password: "123456",
+    };
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    const usersAtEnd = await helper.usersInDb();
+    assert(
+      result.body.error.includes("shorter than the minimum allowed length")
+    );
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+  });
+
+  test("creation fails if username is missing", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      name: "testName",
+      password: "123456",
+    };
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    const usersAtEnd = await helper.usersInDb();
+    assert(result.body.error.includes("Path `username` is required"));
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+  });
+
+  test("creation fails if password is missing", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "testUsername",
+      name: "testName",
+    };
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    const usersAtEnd = await helper.usersInDb();
+    assert(result.body.error.includes("password is required"));
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+  });
+
+  test("creation fails if password is shorter than 3 characters"),
+    async () => {
+      const usersAtStart = await helper.usersInDb();
+      const newUser = {
+        username: "testUsername",
+        name: "testName",
+        password: "12",
+      };
+
+      const result = await api
+        .post("/api/users")
+        .send(newUser)
+        .expect(400)
+        .expect("Content-Type", /application\/json/);
+
+      const usersAtEnd = await helper.usersInDb();
+      assert(
+        result.body.error.includes(
+          "password must be at least 3 characters long"
+        )
+      );
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    };
 });
 
 after(async () => {
