@@ -18,7 +18,6 @@ blogsRouter.get("/", async (request, response, next) => {
 
 blogsRouter.post("/", async (request, response, next) => {
   try {
-    const token = request.token;
     const body = request.body;
 
     // check that a user is provided
@@ -60,17 +59,33 @@ blogsRouter.post("/", async (request, response, next) => {
 
 blogsRouter.delete("/:id", async (request, response, next) => {
   try {
+    if (!request.token) {
+      return response.status(401).json({ error: "token missing" });
+    }
+
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: "token invalid" });
+    }
+
     const { id } = request.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return response.status(400).json({ error: "malformatted id" });
     }
 
-    const deletedBlog = await Blog.findByIdAndDelete(id);
-
-    if (!deletedBlog) {
+    const blog = await Blog.findById(id);
+    if (!blog) {
       return response.status(404).json({ error: "blog not found" });
     }
+
+    if (blog.user.toString() !== decodedToken.id.toString()) {
+      return response
+        .status(403)
+        .json({ error: "only the creator can delete this blog" });
+    }
+
+    await Blog.findByIdAndDelete(id);
 
     return response.status(204).end();
   } catch (error) {
