@@ -6,7 +6,7 @@ const supertest = require("supertest");
 const assert = require("node:assert");
 const app = require("../app");
 const Blog = require("../models/blog");
-const User = require("../models/user");
+const User = require("../models/User");
 const helper = require("./test_helper");
 
 const api = supertest(app);
@@ -23,12 +23,30 @@ const initialBlogs = [
   },
 ];
 
+let token;
+
 beforeEach(async () => {
   await Blog.deleteMany({});
+  await User.deleteMany({});
+
   let blogObject = new Blog(initialBlogs[0]);
   await blogObject.save();
   blogObject = new Blog(initialBlogs[1]);
   await blogObject.save();
+
+  const passwordHash = await bcrypt.hash("password123", 10);
+  await new User({
+    username: "testuser",
+    name: "Test User",
+    passwordHash,
+  }).save();
+
+  const loginResponse = await api.post("/api/login").send({
+    username: "testuser",
+    password: "password123",
+  });
+
+  token = loginResponse.body.token;
 });
 
 test("blogs are returned as json", async () => {
@@ -65,7 +83,7 @@ test("blogs have id property and it is unique", async () => {
   }
 });
 
-test("HTTP request to api/blogs successfully creates a new post"),
+test.only("HTTP request to api/blogs successfully creates a new blog"),
   async () => {
     const newBlog = {
       title: "New Blog",
@@ -74,7 +92,10 @@ test("HTTP request to api/blogs successfully creates a new post"),
       likes: 5,
     };
 
-    const response = await api.post("/api/blogs").send(newBlog);
+    const response = await api
+      .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
+      .send(newBlog);
 
     assert.strictEqual(response.status, 201, "Response status should be 201");
     assert.ok(
@@ -89,6 +110,19 @@ test("HTTP request to api/blogs successfully creates a new post"),
     const titles = blogsAfter.map((b) => b.title);
     assert.ok(titles.includes("New Blog"), "New blog title should be in DB");
   };
+
+test.only("adding a blog fails with status code 401 if token is not provided", async () => {
+  const newBlog = {
+    title: "Unauthorized Blog",
+    author: "Author",
+    url: "http://example.com",
+    likes: 1,
+  };
+  const response = await api.post("/api/blogs").send(newBlog);
+  assert.strictEqual(response.status, 401);
+  const blogsAfter = await Blog.find({});
+  assert.strictEqual(blogsAfter.length, initialBlogs.length);
+});
 
 test("if likes property is missing, it defaults to 0", async () => {
   const newBlog = {
